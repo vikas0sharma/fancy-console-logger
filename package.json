@@ -11,7 +11,8 @@
     ],
     "activationEvents": [
         "onCommand:fancyLog.colorLog",
-        "onCommand:fancyLog.tableLog"
+        "onCommand:fancyLog.tableLog",
+        "onCommand:fancyLog.commentLogs"
     ],
     "main": "./out/extension.js",
     "contributes": {
@@ -23,6 +24,10 @@
             {
                 "command": "fancyLog.tableLog",
                 "title": "Fancy Table Log"
+            },
+            {
+                "command": "fancyLog.commentLogs",
+                "title": "Fancy Comment All Logs"
             }
         ]
     },

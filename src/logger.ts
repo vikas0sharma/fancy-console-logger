@@ -1,5 +1,5 @@
 import { TextDocument, TextEditor, Position } from "vscode";
-import { getMessageLine, getSpaces } from "./log-helper";
+import { getMessageLine, getSpaces, getAllConsoles } from "./log-helper";
 import { LogType } from "./log-types";
 
 
@@ -36,6 +36,33 @@ export async function log(editor: TextEditor, logType: LogType) {
     }
 }
 
+export async function commentAll(editor: TextEditor) {
+    if (!editor) {
+        return;
+    }
+
+
+    const tabSize = Number(editor.options.tabSize);
+    const document = editor.document;
+    const consoleLogs = getAllConsoles(document, tabSize);
+
+    await editor.edit(editorBuilder => {
+        consoleLogs.forEach(log => {
+            log.lines.forEach(({ range }) => {
+                editorBuilder.delete(range);
+                editorBuilder.insert(
+                    // @ts-ignore
+                    new Position(range.start.line, 0),
+                    `${log.spaces}// ${document.getText(range).trim()}\n`
+                );
+            })
+        })
+
+    });
+}
+
+
+
 function logMsg(
     document: TextDocument,
     selectedLineNumber: number,
@@ -50,7 +77,7 @@ function logMsg(
 
     //const consoleLog = `console.log('%c${selectedVar} %c>>>>>','${s1}','${s2}', ${selectedVar});`;
     let consoleLog = '';
-    
+
     switch (logType) {
         case LogType.Color:
             consoleLog = getColoredMsg(selectedVar);
@@ -80,3 +107,4 @@ function getColoredMsg(selectedVar: string): string {
 function getTableMsg(selectedVar: string): string {
     return `console.table(${selectedVar});`;
 }
+

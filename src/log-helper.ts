@@ -225,3 +225,43 @@ export function getSpaces(document: TextDocument, selectedLineNumber: number, ta
         }
     }
 }
+
+export function getAllConsoles(document: TextDocument, tabSize: number) {
+    const documentNbrOfLines = document.lineCount;
+    const logMessages = [];
+    for (let i = 0; i < documentNbrOfLines; i++) {
+
+        let numberOfOpenParenthesis = 0;
+        let numberOfCloseParenthesis = 0;
+        if (/console\./.test(document.lineAt(i).text)) {
+            const logMessageLines = { spaces: "", lines: [] };
+            logMessageLines.spaces = getSpaces(document, i, tabSize);
+            for (let k = i; k <= documentNbrOfLines; k++) {
+                logMessageLines.lines.push({
+                    // @ts-ignore
+                    range: document.lineAt(k).rangeIncludingLineBreak
+                });
+                if (document.lineAt(k).text.match(/\(/g)) {
+                    // @ts-ignore
+                    numberOfOpenParenthesis += document.lineAt(k).text.match(/\(/g)
+                        .length;
+                }
+                if (document.lineAt(k).text.match(/\)/g)) {
+                    // @ts-ignore
+                    numberOfCloseParenthesis += document.lineAt(k).text.match(/\)/g)
+                        .length;
+                }
+                if (
+                    numberOfOpenParenthesis === numberOfCloseParenthesis &&
+                    numberOfOpenParenthesis !== 0
+                )
+                    break;
+            }
+            logMessages.push(logMessageLines);
+        }
+
+
+
+    }
+    return logMessages;
+}
